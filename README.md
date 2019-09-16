@@ -5,14 +5,14 @@
 This crate is in its infancy. Right now it is more an 'act on my inspiration quickly' than a fully featured library.
 
 ## Rust Docs
-[Documentation is here.](https://docs.rs/copystr/0.0.1)
+[Documentation is here.](https://docs.rs/copystr/0.0.2)
 
 ## Installation
 
 Add to your `Cargo.toml`:
 ```toml
 [dependencies]
-copystr = "0.0.1"
+copystr = "0.0.2"
 ```
 
 ## Usage
