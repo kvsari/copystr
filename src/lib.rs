@@ -2,6 +2,7 @@
 //! Strings that exist on the stack. This makes them `Copy`. Useful for when you want to
 //! keep some small text inside a struct or enum and retain copy semantics. Strings are
 //! stored as a byte array with UTF8 conversion on the fly.
+use std::fmt;
 
 const ERROR_MSG: &'static str = "&str len greater than max_len";
 
@@ -9,7 +10,7 @@ const ERROR_MSG: &'static str = "&str len greater than max_len";
 macro_rules! csstruct {
     ($css:ident, $asize:expr) => {
         #[allow(non_camel_case_types)]
-        #[derive(Debug, Copy, Clone)]
+        #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
         pub struct $css {            
             raw: [u8; $asize],            
             len: usize,
@@ -27,6 +28,15 @@ macro_rules! csstruct {
             pub fn as_str(&self) -> &str {
                 let (s, _) = self.raw.split_at(self.len);
                 std::str::from_utf8(s).expect("Valid UTF8 invariant violated.")
+            }
+
+            pub fn as_bytes(&self) -> &[u8] {
+                let (b, _) = self.raw.split_at(self.len);
+                b
+            }
+
+            pub fn as_all_bytes(&self) -> &[u8] {
+                &self.raw
             }
         }
 
@@ -51,6 +61,12 @@ macro_rules! csstruct {
                 })
             }
         }
+
+        impl fmt::Display for $css {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                write!(f, "{}", self.as_str())
+            }
+        }
     };
 }
 
@@ -67,7 +83,13 @@ mod tests {
     
     #[test]
     fn copy_string_struct() {
-        let copy_string = s4::try_from("ABC").unwrap();
-        assert_eq!(copy_string.as_str(), "ABC");
+        let cs = s4::try_from("ABC").unwrap();
+        assert_eq!(cs.as_str(), "ABC");
+    }
+
+    #[test]
+    fn display() {
+        let cs = s4::try_from("XYZ").unwrap();
+        assert_eq!(cs.to_string(), "XYZ");
     }
 }
